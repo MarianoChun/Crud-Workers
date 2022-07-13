@@ -1,4 +1,4 @@
-package com.example.crudWorkers;
+package com.example.models;
 
 import javax.persistence.*;
 
