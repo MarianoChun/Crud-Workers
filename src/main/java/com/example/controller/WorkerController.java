@@ -20,6 +20,7 @@ public class WorkerController {
                             @RequestParam String email,
                             @RequestParam String password,
                             @RequestParam String occupation){
+
         Worker newWorker = new Worker();
         newWorker.setName(name);
         newWorker.setSurname(surname);
@@ -27,10 +28,24 @@ public class WorkerController {
         newWorker.setPassword(password);
         newWorker.setOccupation(occupation);
 
-        workerRepository.save(newWorker);
-       return "Saved!";
+        if(workerRepository.save(newWorker) != null){
+            return "Saved!";
+        }
+
+        return "Fail";
     }
 
+    @GetMapping(path = "/getWorker/{id}")
+    @ResponseBody
+    public Worker getWorker(@PathVariable Long id) {
+        Optional<Worker> worker = workerRepository.findById(id);
+        if(worker.isEmpty()) {
+            return null;
+        }
+
+        return worker.get();
+
+    }
     @GetMapping(path = "/allWorkers")
     @ResponseBody
     public Iterable<Worker> getAllWorkers(){
@@ -46,6 +61,6 @@ public class WorkerController {
         }
 
         workerRepository.delete(workerSearched.get());
-        return "Worker successfully deleted from database!" ;
+        return "Worker successfully deleted from database!";
     }
 }
