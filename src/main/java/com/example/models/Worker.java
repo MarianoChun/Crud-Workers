@@ -3,12 +3,13 @@ package com.example.models;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "workers")
-@EqualsAndHashCode
+@EqualsAndHashCode @ToString
 public class Worker {
 
     @GeneratedValue(strategy = GenerationType.AUTO)

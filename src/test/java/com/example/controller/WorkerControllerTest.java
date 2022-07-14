@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.nio.file.WatchEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +37,7 @@ class WorkerControllerTest {
         workers = new ArrayList<>();
 
         Worker worker1 = new Worker();
-        worker1.setId(Long.getLong("20"));
+        worker1.setId(20L);
         worker1.setName("Hugo");
         worker1.setSurname("Mendez");
         worker1.setEmail("hugo@gmail.com");
@@ -44,7 +45,7 @@ class WorkerControllerTest {
         worker1.setOccupation("Medic");
 
         Worker worker2 = new Worker();
-        worker2.setId(Long.getLong("5"));
+        worker2.setId(5L);
         worker2.setName("Pepe");
         worker2.setSurname("Garcia");
         worker2.setEmail("garciaPepe@gmail.com");
@@ -52,7 +53,7 @@ class WorkerControllerTest {
         worker2.setOccupation("Waiter");
 
         Worker worker3 = new Worker();
-        worker3.setId(Long.getLong("9"));
+        worker3.setId(9L);
         worker3.setName("John");
         worker3.setSurname("Doe");
         worker3.setEmail("John@hotmail.com");
@@ -104,4 +105,22 @@ class WorkerControllerTest {
         assertTrue(((Collection<?>)workerController.getAllWorkers()).size() == 3);
     }
 
+    @Test
+    void modifyWorker(){
+        when(workerRepository.findById(5L)).thenReturn(Optional.of(workers.get(1)));
+
+        Worker expectedWorkerModified = new Worker();
+
+        expectedWorkerModified.setId(5L);
+        expectedWorkerModified.setName("Pedro");
+        expectedWorkerModified.setSurname("Torres");
+        expectedWorkerModified.setEmail("pedro@hotmail.com");
+        expectedWorkerModified.setPassword("111111");
+        expectedWorkerModified.setOccupation("Salesman");
+
+        workerController.modifyWorker(5L, "Pedro", "Torres", "pedro@hotmail.com", "111111", "Salesman");
+
+        assertEquals(expectedWorkerModified, workerController.getWorker(5L));
+
+    }
 }

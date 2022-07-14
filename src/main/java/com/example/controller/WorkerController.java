@@ -35,6 +35,31 @@ public class WorkerController {
         return "Fail";
     }
 
+    @PutMapping(path = "/modifyWorker")
+    @ResponseBody
+    public String modifyWorker(@PathVariable Long id,
+                               @RequestParam String name,
+                               @RequestParam String surname,
+                               @RequestParam String email,
+                               @RequestParam String password,
+                               @RequestParam String occupation){
+
+        Worker selectedWorker = getWorker(id);
+
+        if(selectedWorker == null){
+            return "The requested worker to modify doesn't exists";
+        }
+
+
+        selectedWorker.setName(name);
+        selectedWorker.setSurname(surname);
+        selectedWorker.setEmail(email);
+        selectedWorker.setPassword(password);
+        selectedWorker.setOccupation(occupation);
+
+        return "Worker with id:" + selectedWorker.getId() + " modified!";
+    }
+
     @GetMapping(path = "/getWorker/{id}")
     @ResponseBody
     public Worker getWorker(@PathVariable Long id) {
