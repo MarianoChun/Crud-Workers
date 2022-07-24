@@ -1,8 +1,10 @@
 package com.example.controller;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import com.example.models.Worker;
 import com.example.repository.WorkerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -15,6 +17,7 @@ public class WorkerController {
 
     @PostMapping(path = "/addWorker")
     @ResponseBody
+    @Transactional
     public String addWorker(@RequestParam String name,
                             @RequestParam String surname,
                             @RequestParam String email,
@@ -37,7 +40,7 @@ public class WorkerController {
 
     @PutMapping(path = "/modifyWorker")
     @ResponseBody
-    public String modifyWorker(@PathVariable Long id,
+    public String modifyWorker(@PathVariable @RequestParam Long id,
                                @RequestParam String name,
                                @RequestParam String surname,
                                @RequestParam String email,
@@ -50,13 +53,13 @@ public class WorkerController {
             return "The requested worker to modify doesn't exists";
         }
 
-
         selectedWorker.setName(name);
         selectedWorker.setSurname(surname);
         selectedWorker.setEmail(email);
         selectedWorker.setPassword(password);
         selectedWorker.setOccupation(occupation);
 
+        workerRepository.save(selectedWorker);
         return "Worker with id:" + selectedWorker.getId() + " modified!";
     }
 
