@@ -1,9 +1,10 @@
 package com.example.controller;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import com.example.models.Worker;
 import com.example.repository.WorkerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class WorkerController {
     @PostMapping(path = "/addWorker")
     @ResponseBody
     @Transactional
-    public String addWorker(@RequestParam String name,
+    public ResponseEntity<String> addWorker(@RequestParam String name,
                             @RequestParam String surname,
                             @RequestParam String email,
                             @RequestParam String password,
@@ -32,25 +33,25 @@ public class WorkerController {
         newWorker.setOccupation(occupation);
 
         if(workerRepository.save(newWorker) != null){
-            return "Saved!";
+            return ResponseEntity.status(HttpStatus.CREATED).body("Saved!");
         }
 
-        return "Fail";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The creation of the worker has failed");
     }
 
     @PutMapping(path = "/modifyWorker")
     @ResponseBody
-    public String modifyWorker(@PathVariable @RequestParam Long id,
+    public ResponseEntity<String> modifyWorker(@PathVariable @RequestParam Long id,
                                @RequestParam String name,
                                @RequestParam String surname,
                                @RequestParam String email,
                                @RequestParam String password,
                                @RequestParam String occupation){
 
-        Worker selectedWorker = getWorker(id);
+        Worker selectedWorker = getWorker(id).getBody();
 
         if(selectedWorker == null){
-            return "The requested worker to modify doesn't exists";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The requested worker to modify doesn't exists");
         }
 
         selectedWorker.setName(name);
@@ -60,35 +61,39 @@ public class WorkerController {
         selectedWorker.setOccupation(occupation);
 
         workerRepository.save(selectedWorker);
-        return "Worker with id:" + selectedWorker.getId() + " modified!";
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Worker with id:" + selectedWorker.getId() + " modified!");
     }
 
     @GetMapping(path = "/getWorker/{id}")
     @ResponseBody
-    public Worker getWorker(@PathVariable Long id) {
+    public ResponseEntity<Worker> getWorker(@PathVariable Long id) {
         Optional<Worker> worker = workerRepository.findById(id);
         if(worker.isEmpty()) {
-            return null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        return worker.get();
+        return ResponseEntity.status(HttpStatus.OK).body(worker.get());
 
     }
     @GetMapping(path = "/allWorkers")
     @ResponseBody
-    public Iterable<Worker> getAllWorkers(){
-        return workerRepository.findAll();
+    public ResponseEntity<Iterable<Worker>> getAllWorkers(){
+        if(workerRepository.findAll() == null){
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(workerRepository.findAll());
     }
 
     @DeleteMapping(path = "/deleteWorker/{id}")
     @ResponseBody
-    public String removeWorker(@PathVariable(value = "id") Long id){
+    public ResponseEntity<String> removeWorker(@PathVariable(value = "id") Long id){
         Optional<Worker> workerSearched = workerRepository.findById(id);
         if(workerSearched.isEmpty()) {
-            return "The worker with the given id doesn't exists or was already deleted";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The worker with the given id doesn't exists or was already deleted");
         }
 
         workerRepository.delete(workerSearched.get());
-        return "Worker successfully deleted from database!";
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Worker successfully deleted from database!");
     }
 }

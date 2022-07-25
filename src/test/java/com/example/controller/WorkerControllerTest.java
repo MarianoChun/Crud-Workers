@@ -87,7 +87,7 @@ class WorkerControllerTest {
     void addWorker() {
         when(workerRepository.save(any(Worker.class))).thenReturn(workers.get(0));
 
-        String response = workerController.addWorker("Hugo", "Mendez", "hugo@gmail.com", "123", "Medic");
+        String response = workerController.addWorker("Hugo", "Mendez", "hugo@gmail.com", "123", "Medic").getBody();
 
         assertTrue(response.equals("Saved!"));
     }
@@ -103,7 +103,7 @@ class WorkerControllerTest {
     void getAllWorkers() {
         when(workerRepository.findAll()).thenReturn(workers);
 
-        assertTrue(((Collection<?>)workerController.getAllWorkers()).size() == 3);
+        assertTrue(((Collection<?>)workerController.getAllWorkers().getBody()).size() == 3);
     }
 
     @Test
@@ -121,7 +121,7 @@ class WorkerControllerTest {
 
         workerController.modifyWorker(5L, "Pedro", "Torres", "pedro@hotmail.com", "111111", "Salesman");
 
-        assertEquals(expectedWorkerModified, workerController.getWorker(5L));
+        assertEquals(expectedWorkerModified, workerController.getWorker(5L).getBody());
 
     }
 }
