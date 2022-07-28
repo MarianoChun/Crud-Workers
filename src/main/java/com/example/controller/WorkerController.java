@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/api")
+@RequestMapping(path = "/api/workers")
 public class WorkerController {
     @Autowired
     private WorkerRepository workerRepository;
 
-    @PostMapping(path = "/addWorker")
+    @PostMapping
     @ResponseBody
     @Transactional
     public ResponseEntity<String> addWorker(@RequestParam String name,
@@ -39,9 +39,9 @@ public class WorkerController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The creation of the worker has failed");
     }
 
-    @PutMapping(path = "/modifyWorker")
+    @PutMapping(path = "/{id}")
     @ResponseBody
-    public ResponseEntity<String> modifyWorker(@PathVariable @RequestParam Long id,
+    public ResponseEntity<String> modifyWorker(@PathVariable Long id,
                                @RequestParam String name,
                                @RequestParam String surname,
                                @RequestParam String email,
@@ -64,7 +64,7 @@ public class WorkerController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Worker with id:" + selectedWorker.getId() + " modified!");
     }
 
-    @GetMapping(path = "/getWorker/{id}")
+    @GetMapping(path = "/{id}")
     @ResponseBody
     public ResponseEntity<Worker> getWorker(@PathVariable Long id) {
         Optional<Worker> worker = workerRepository.findById(id);
@@ -75,7 +75,7 @@ public class WorkerController {
         return ResponseEntity.status(HttpStatus.OK).body(worker.get());
 
     }
-    @GetMapping(path = "/allWorkers")
+    @GetMapping
     @ResponseBody
     public ResponseEntity<Iterable<Worker>> getAllWorkers(){
         if(workerRepository.findAll() == null){
@@ -85,7 +85,7 @@ public class WorkerController {
         return ResponseEntity.status(HttpStatus.OK).body(workerRepository.findAll());
     }
 
-    @DeleteMapping(path = "/deleteWorker/{id}")
+    @DeleteMapping(path = "/{id}")
     @ResponseBody
     public ResponseEntity<String> removeWorker(@PathVariable(value = "id") Long id){
         Optional<Worker> workerSearched = workerRepository.findById(id);
