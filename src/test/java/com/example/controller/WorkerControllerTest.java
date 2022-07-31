@@ -10,15 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.file.WatchEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +30,7 @@ class WorkerControllerTest {
     private WorkerController workerController;
 
     private List<Worker> workers;
+
 
     @BeforeEach
     void setUp() {
@@ -59,7 +59,6 @@ class WorkerControllerTest {
         worker3.setEmail("John@hotmail.com");
         worker3.setPassword("0988766");
         worker3.setOccupation("Librarian");
-
 
         workers.add(worker1);
         workers.add(worker2);
@@ -123,5 +122,12 @@ class WorkerControllerTest {
 
         assertEquals(expectedWorkerModified, workerController.getWorker(5L).getBody());
 
+    }
+
+    @Test
+    void removeWorker() {
+        when(workerRepository.findById(9L)).thenReturn(Optional.of(workers.get(2)));
+
+        assertEquals("Worker successfully deleted from database!", workerController.removeWorker(9L).getBody());
     }
 }
