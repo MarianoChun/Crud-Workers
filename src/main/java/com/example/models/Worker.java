@@ -32,4 +32,13 @@ public class Worker {
     @Getter @Setter
     private String occupation;
 
+    public Worker(String name, String surname, String email, String password, String occupation) {
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.occupation = occupation;
+    }
+
+    public Worker(){};
 }

@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.util.Iterator;
 import java.util.Optional;
 
 @RestController
@@ -19,46 +21,47 @@ public class WorkerController {
     @PostMapping
     @ResponseBody
     @Transactional
-    public ResponseEntity<String> addWorker(@RequestParam String name,
-                            @RequestParam String surname,
-                            @RequestParam String email,
-                            @RequestParam String password,
-                            @RequestParam String occupation){
-
-        Worker newWorker = new Worker();
-        newWorker.setName(name);
-        newWorker.setSurname(surname);
-        newWorker.setEmail(email);
-        newWorker.setPassword(password);
-        newWorker.setOccupation(occupation);
-
-        if(workerRepository.save(newWorker) != null){
+    public ResponseEntity<String> addWorker(@RequestBody Worker worker){
+        if(workerHasExistingEmail(worker)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The email given by the worker already exists, try another");
+        }
+        if(workerRepository.save(worker) != null){
             return ResponseEntity.status(HttpStatus.CREATED).body("Saved!");
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The creation of the worker has failed");
     }
 
+    private boolean workerHasExistingEmail(Worker worker) {
+        Iterator<Worker> workersIterator = getAllWorkers().getBody().iterator();
+        String actualWorkerEmail;
+        boolean existingEmail = false;
+
+        while(workersIterator.hasNext()){
+            actualWorkerEmail = workersIterator.next().getEmail();
+            existingEmail = existingEmail || actualWorkerEmail.equals(worker.getEmail());
+        }
+
+        return  existingEmail;
+    }
+
     @PutMapping(path = "/{id}")
     @ResponseBody
     public ResponseEntity<String> modifyWorker(@PathVariable Long id,
-                               @RequestParam String name,
-                               @RequestParam String surname,
-                               @RequestParam String email,
-                               @RequestParam String password,
-                               @RequestParam String occupation){
+                               @RequestBody Worker worker){
 
         Worker selectedWorker = getWorker(id).getBody();
+        Worker newWorker = worker;
 
         if(selectedWorker == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The requested worker to modify doesn't exists");
         }
 
-        selectedWorker.setName(name);
-        selectedWorker.setSurname(surname);
-        selectedWorker.setEmail(email);
-        selectedWorker.setPassword(password);
-        selectedWorker.setOccupation(occupation);
+        selectedWorker.setName(newWorker.getName());
+        selectedWorker.setSurname(newWorker.getSurname());
+        selectedWorker.setEmail(newWorker.getEmail());
+        selectedWorker.setPassword(newWorker.getPassword());
+        selectedWorker.setOccupation(newWorker.getOccupation());
 
         workerRepository.save(selectedWorker);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Worker with id:" + selectedWorker.getId() + " modified!");
@@ -87,7 +90,7 @@ public class WorkerController {
 
     @DeleteMapping(path = "/{id}")
     @ResponseBody
-    public ResponseEntity<String> removeWorker(@PathVariable(value = "id") Long id){
+    public ResponseEntity<String> removeWorker(@PathVariable Long id){
         Optional<Worker> workerSearched = workerRepository.findById(id);
         if(workerSearched.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The worker with the given id doesn't exists or was already deleted");

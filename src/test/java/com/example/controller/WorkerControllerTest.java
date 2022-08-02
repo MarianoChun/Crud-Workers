@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.models.Worker;
 import com.example.repository.WorkerRepository;
+import com.fasterxml.jackson.databind.util.ArrayIterator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,10 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,29 +34,14 @@ class WorkerControllerTest {
     void setUp() {
         workers = new ArrayList<>();
 
-        Worker worker1 = new Worker();
+        Worker worker1 = new Worker("Hugo", "Mendez", "hugo@gmail.com", "123", "Medic");
         worker1.setId(20L);
-        worker1.setName("Hugo");
-        worker1.setSurname("Mendez");
-        worker1.setEmail("hugo@gmail.com");
-        worker1.setPassword("123");
-        worker1.setOccupation("Medic");
 
-        Worker worker2 = new Worker();
+        Worker worker2 = new Worker("Pepe", "Garcia", "garcia@gmail.com", "444411111", "Waiter");
         worker2.setId(5L);
-        worker2.setName("Pepe");
-        worker2.setSurname("Garcia");
-        worker2.setEmail("garciaPepe@gmail.com");
-        worker2.setPassword("444411111");
-        worker2.setOccupation("Waiter");
 
-        Worker worker3 = new Worker();
+        Worker worker3 = new Worker("John", "Doe", "John@hotmail.com", "0988766", "Librarian");
         worker3.setId(9L);
-        worker3.setName("John");
-        worker3.setSurname("Doe");
-        worker3.setEmail("John@hotmail.com");
-        worker3.setPassword("0988766");
-        worker3.setOccupation("Librarian");
 
         workers.add(worker1);
         workers.add(worker2);
@@ -71,13 +54,8 @@ class WorkerControllerTest {
 
     @Test
     void save(){
-        Worker testWorker = new Worker();
-        testWorker.setId(Long.getLong("99"));
-        testWorker.setName("Sara");
-        testWorker.setSurname("Torres");
-        testWorker.setEmail("torresSara@gmail.com");
-        testWorker.setPassword("44444");
-        testWorker.setOccupation("Firefighter");
+        Worker testWorker = new Worker("Sara", "Torres", "torresSara@gmail.com", "44444", "Firefighter");
+        testWorker.setId(99L);
 
         when(workerRepository.save(any(Worker.class))).thenReturn(testWorker);
         assertNotNull(workerRepository.save(testWorker));
@@ -86,11 +64,20 @@ class WorkerControllerTest {
     void addWorker() {
         when(workerRepository.save(any(Worker.class))).thenReturn(workers.get(0));
 
-        String response = workerController.addWorker("Hugo", "Mendez", "hugo@gmail.com", "123", "Medic").getBody();
+        String response = workerController.addWorker(new Worker("Hugo", "Mendez", "hugo@gmail.com", "123", "Medic")).getBody();
 
         assertTrue(response.equals("Saved!"));
     }
 
+    @Test
+    void addWorkerWithExistingEmail(){
+        Iterable<Worker> iterator = new ArrayIterator<>(new Worker[]{workers.get(1)});
+        when(workerRepository.findAll()).thenReturn(iterator);
+
+        String response = workerController.addWorker(new Worker("Juliana","Garcia", "garcia@gmail.com", "222", "Nurse")).getBody();
+
+        assertEquals("The email given by the worker already exists, try another", response);
+    }
     @Test
     void getWorker() {
         when(workerRepository.findById(9L)).thenReturn(Optional.of(workers.get(2)));
@@ -109,16 +96,11 @@ class WorkerControllerTest {
     void modifyWorker(){
         when(workerRepository.findById(5L)).thenReturn(Optional.of(workers.get(1)));
 
-        Worker expectedWorkerModified = new Worker();
+        Worker expectedWorkerModified = new Worker("Pedro", "Torres", "pedro@hotmail.com", "111111", "Salesman");
 
         expectedWorkerModified.setId(5L);
-        expectedWorkerModified.setName("Pedro");
-        expectedWorkerModified.setSurname("Torres");
-        expectedWorkerModified.setEmail("pedro@hotmail.com");
-        expectedWorkerModified.setPassword("111111");
-        expectedWorkerModified.setOccupation("Salesman");
 
-        workerController.modifyWorker(5L, "Pedro", "Torres", "pedro@hotmail.com", "111111", "Salesman");
+        workerController.modifyWorker(5L, new Worker("Pedro", "Torres", "pedro@hotmail.com", "111111", "Salesman"));
 
         assertEquals(expectedWorkerModified, workerController.getWorker(5L).getBody());
 
