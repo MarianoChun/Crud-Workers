@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.models.Worker;
 import com.example.repository.WorkerRepository;
+import com.example.services.WorkerService;
 import com.fasterxml.jackson.databind.util.ArrayIterator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,8 @@ class WorkerControllerTest {
 
     @Mock
     private WorkerRepository workerRepository;
+    @Mock
+    private WorkerService workerService;
 
     @InjectMocks
     private WorkerController workerController;
@@ -62,7 +65,7 @@ class WorkerControllerTest {
     }
     @Test
     void addWorker() {
-        when(workerRepository.save(any(Worker.class))).thenReturn(workers.get(0));
+        when(workerService.saveWorker(any(Worker.class))).thenReturn(workers.get(0));
 
         String response = workerController.addWorker(new Worker("Hugo", "Mendez", "hugo@gmail.com", "123", "Medic")).getBody();
 
@@ -72,7 +75,7 @@ class WorkerControllerTest {
     @Test
     void addWorkerWithExistingEmail(){
         Iterable<Worker> iterator = new ArrayIterator<>(new Worker[]{workers.get(1)});
-        when(workerRepository.findAll()).thenReturn(iterator);
+        when(workerService.getAllWorkers()).thenReturn(iterator);
 
         String response = workerController.addWorker(new Worker("Juliana","Garcia", "garcia@gmail.com", "222", "Nurse")).getBody();
 
@@ -80,36 +83,37 @@ class WorkerControllerTest {
     }
     @Test
     void getWorker() {
-        when(workerRepository.findById(9L)).thenReturn(Optional.of(workers.get(2)));
+        when(workerService.getWorker(9L)).thenReturn(workers.get(2));
 
         assertNotNull(workerController.getWorker(9L));
     }
 
     @Test
     void getAllWorkers() {
-        when(workerRepository.findAll()).thenReturn(workers);
+        when(workerService.getAllWorkers()).thenReturn(workers);
 
         assertTrue(((Collection<?>)workerController.getAllWorkers().getBody()).size() == 3);
     }
 
     @Test
     void modifyWorker(){
-        when(workerRepository.findById(5L)).thenReturn(Optional.of(workers.get(1)));
+        when(workerService.getWorker(5L)).thenReturn(workers.get(1));
 
         Worker expectedWorkerModified = new Worker("Pedro", "Torres", "pedro@hotmail.com", "111111", "Salesman");
-
         expectedWorkerModified.setId(5L);
+
+        when(workerService.getWorker(5L)).thenReturn(expectedWorkerModified);
 
         workerController.modifyWorker(5L, new Worker("Pedro", "Torres", "pedro@hotmail.com", "111111", "Salesman"));
 
+        
         assertEquals(expectedWorkerModified, workerController.getWorker(5L).getBody());
 
     }
 
     @Test
     void removeWorker() {
-        when(workerRepository.findById(9L)).thenReturn(Optional.of(workers.get(2)));
-
+        when(workerService.getWorker(9L)).thenReturn((workers.get(2)));
         assertEquals("Worker successfully deleted from database!", workerController.removeWorker(9L).getBody());
     }
 }
