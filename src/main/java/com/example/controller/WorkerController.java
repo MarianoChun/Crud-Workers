@@ -17,6 +17,7 @@ import java.util.Optional;
 @RequestMapping(path = "/api/workers")
 public class WorkerController {
 
+    @Autowired
     private WorkerService workerService;
 
     @PostMapping

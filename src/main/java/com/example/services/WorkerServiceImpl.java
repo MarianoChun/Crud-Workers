@@ -13,12 +13,12 @@ import java.util.Optional;
 public class WorkerServiceImpl implements WorkerService{
 
     @Autowired
-    WorkerRepository workerRepository;
+    private WorkerRepository workerRepository;
 
 
     @Override
     public Worker getWorker(Long id) {
-        return workerRepository.findById(id).get();
+        return workerRepository.findById(id).orElse(null);
     }
 
     @Override

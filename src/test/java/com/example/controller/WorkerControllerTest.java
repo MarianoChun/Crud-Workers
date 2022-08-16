@@ -106,7 +106,7 @@ class WorkerControllerTest {
 
         workerController.modifyWorker(5L, new Worker("Pedro", "Torres", "pedro@hotmail.com", "111111", "Salesman"));
 
-        
+
         assertEquals(expectedWorkerModified, workerController.getWorker(5L).getBody());
 
     }
