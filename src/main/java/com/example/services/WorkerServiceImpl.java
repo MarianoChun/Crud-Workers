@@ -34,17 +34,16 @@ public class WorkerServiceImpl implements WorkerService{
     @Override
     public void modifyWorker(Long id, Worker worker) {
         Worker selectedWorker = getWorker(id);
-        Worker newWorker = worker;
 
         if(selectedWorker == null){
             throw new IllegalArgumentException("The requested worker to modify doesn't exists");
         }
 
-        selectedWorker.setName(newWorker.getName());
-        selectedWorker.setSurname(newWorker.getSurname());
-        selectedWorker.setEmail(newWorker.getEmail());
-        selectedWorker.setPassword(newWorker.getPassword());
-        selectedWorker.setOccupation(newWorker.getOccupation());
+        selectedWorker.setName(worker.getName());
+        selectedWorker.setSurname(worker.getSurname());
+        selectedWorker.setEmail(worker.getEmail());
+        selectedWorker.setPassword(worker.getPassword());
+        selectedWorker.setOccupation(worker.getOccupation());
 
         saveWorker(selectedWorker);
     }

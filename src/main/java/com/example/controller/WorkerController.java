@@ -14,13 +14,11 @@ import java.util.Iterator;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/api/workers")
+@RequestMapping(path = "/api")
 public class WorkerController {
 
-    @Autowired
     private WorkerService workerService;
-
-    @PostMapping
+    @PostMapping(path = "/workers")
     @ResponseBody
     @Transactional
     public ResponseEntity<String> addWorker(@RequestBody Worker worker){
@@ -47,7 +45,7 @@ public class WorkerController {
         return  existingEmail;
     }
 
-    @PutMapping(path = "/{id}")
+    @PutMapping(path = "/workers/{id}")
     @ResponseBody
     public ResponseEntity<String> modifyWorker(@PathVariable Long id,
                                @RequestBody Worker worker){
@@ -62,7 +60,7 @@ public class WorkerController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Worker with id:" + selectedWorker.getId() + " modified!");
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = "/workers/{id}")
     @ResponseBody
     public ResponseEntity<Worker> getWorker(@PathVariable Long id) {
         Worker worker = workerService.getWorker(id);
@@ -74,7 +72,7 @@ public class WorkerController {
         return ResponseEntity.status(HttpStatus.OK).body(worker);
 
     }
-    @GetMapping
+    @GetMapping(path = "/workers")
     @ResponseBody
     public ResponseEntity<Iterable<Worker>> getAllWorkers(){
         if(workerService.getAllWorkers() == null){
@@ -84,7 +82,7 @@ public class WorkerController {
         return ResponseEntity.status(HttpStatus.OK).body(workerService.getAllWorkers());
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/workers/{id}")
     @ResponseBody
     public ResponseEntity<String> removeWorker(@PathVariable Long id){
         Worker workerSearched = workerService.getWorker(id);
